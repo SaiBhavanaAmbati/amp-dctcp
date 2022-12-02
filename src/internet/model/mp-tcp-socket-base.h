@@ -75,7 +75,7 @@ public: // public methods
   void SetPathManager (PathManager_t);
   uint32_t GetTotalPktSent();
   string   GetSocketModel();
-  void CheckIncast(uint8_t);
+  void ShouldSuppressSubflows(uint8_t);
   void SetCapacity(string);
   uint32_t m_CongestionRound;
   uint32_t m_incastReDoCounter;
