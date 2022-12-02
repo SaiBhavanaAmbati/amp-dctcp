@@ -70,7 +70,7 @@ bool g_dctcpFastAlpha = false;
 uint32_t g_DTQmarkTh = 1;
 bool g_SDEL = false;
 // Normal Scenario
-string   g_flowType = "XMP";
+string   g_flowType = "DCMPTCP";
 uint32_t g_flowNumber = 4;
 double   g_flowgap = 0.000224;
 double   g_simTime = 1;
@@ -83,8 +83,8 @@ bool     g_specialSubflow = false;
 // Cwnd/Rwnd
 uint32_t g_cwndMin = 1;
 uint32_t g_rwndScale = 100;
-//DynamicSubflows
-bool g_dynamicSubflow = false;
+//IsAdaptiveSubflows
+bool g_IsAdaptiveSubflow = false;
 uint32_t g_incastThreshold = 10;
 uint32_t g_incastExitThreshold = 8;
 //sender
@@ -296,9 +296,9 @@ SetupSimFileName(uint32_t i)
   oss.str ("");
 //oss << g_simName << "_" << g_scenario << "_"<< ConvertCC (g_cc) << "_" << "B" << g_XmpBeta << "_" << "K" << g_REDmaxTh << "_" << g_rtt << "_" << "SF" << g_subflows <<"_" << i << ".data";
   if (g_specialSource)
-    oss << g_scenario << "_"  << "CM"<< g_cwndMin << "_" << g_specialFlowType << "_" << g_flowType << "_DS" << g_dynamicSubflow << "_IT" << g_incastThreshold << "_IET" << g_incastExitThreshold << "_FN" <<  g_flowNumber << "_SFN"<< g_specialFlowNumber << "_" << "FG" << g_flowgap*1000000 << g_simName  << "_" << "B" << g_XmpBeta << "_" << GetQueueMode() << "_" <<  "K" << g_REDmaxTh << "_" << g_rtt << "_ST" << g_simTime << "_" << "SF" << g_subflows <<"_" << i << ".data";
+    oss << g_scenario << "_"  << "CM"<< g_cwndMin << "_" << g_specialFlowType << "_" << g_flowType << "_DS" << g_IsAdaptiveSubflow << "_IT" << g_incastThreshold << "_IET" << g_incastExitThreshold << "_FN" <<  g_flowNumber << "_SFN"<< g_specialFlowNumber << "_" << "FG" << g_flowgap*1000000 << g_simName  << "_" << "B" << g_XmpBeta << "_" << GetQueueMode() << "_" <<  "K" << g_REDmaxTh << "_" << g_rtt << "_ST" << g_simTime << "_" << "SF" << g_subflows <<"_" << i << ".data";
   else
-    oss << g_scenario << "_"  << "CM"<< g_cwndMin << "_" << g_flowType << "_DS" << g_dynamicSubflow << "_IT" << g_incastThreshold << "_IET"<< g_incastExitThreshold << "_FN" <<  g_flowNumber <<"_SFN"<< g_specialFlowNumber << "_" << "FG" <<  g_flowgap*1000000 << g_simName  << "_" << "B" << g_XmpBeta << "_" << GetQueueMode() << "_" <<  "K" << g_REDmaxTh << "_" << g_rtt << "_ST" << g_simTime << "_" << "SF" << g_subflows <<"_" << i << ".data";
+    oss << g_scenario << "_"  << "CM"<< g_cwndMin << "_" << g_flowType << "_DS" << g_IsAdaptiveSubflow << "_IT" << g_incastThreshold << "_IET"<< g_incastExitThreshold << "_FN" <<  g_flowNumber <<"_SFN"<< g_specialFlowNumber << "_" << "FG" <<  g_flowgap*1000000 << g_simName  << "_" << "B" << g_XmpBeta << "_" << GetQueueMode() << "_" <<  "K" << g_REDmaxTh << "_" << g_rtt << "_ST" << g_simTime << "_" << "SF" << g_subflows <<"_" << i << ".data";
   string tmp = oss.str();
   oss.str("");
   return tmp;
@@ -321,9 +321,9 @@ SetupQueueFileName()
   oss.str ("");
 //oss << g_simName << "_" << g_scenario << "_"<< ConvertCC (g_cc) << "_" << "B" << g_XmpBeta << "_" << "K" << g_REDmaxTh << "_" << g_rtt << "_" << "SF" << g_subflows;
   if (g_specialSource)
-    oss << g_scenario << "_" << "CM" << g_cwndMin << "_" << g_specialFlowType << "_" << g_flowType << "_DS" << g_dynamicSubflow << "_IT" << g_incastThreshold << "_IET" << g_incastExitThreshold << "_FN" << g_flowNumber << "_SFN"<< g_specialFlowNumber << "_" << "FG" <<  g_flowgap*1000000 << g_simName << "_" << "B" << g_XmpBeta << "_" << GetQueueMode() << "_" << "K" << g_REDmaxTh << "_" << g_rtt << "_ST" << g_simTime << "_" << "SF" << g_subflows;
+    oss << g_scenario << "_" << "CM" << g_cwndMin << "_" << g_specialFlowType << "_" << g_flowType << "_DS" << g_IsAdaptiveSubflow << "_IT" << g_incastThreshold << "_IET" << g_incastExitThreshold << "_FN" << g_flowNumber << "_SFN"<< g_specialFlowNumber << "_" << "FG" <<  g_flowgap*1000000 << g_simName << "_" << "B" << g_XmpBeta << "_" << GetQueueMode() << "_" << "K" << g_REDmaxTh << "_" << g_rtt << "_ST" << g_simTime << "_" << "SF" << g_subflows;
   else
-    oss << g_scenario << "_" << "CM" << g_cwndMin << "_" << g_flowType << "_DS" << g_dynamicSubflow << "_IT" << g_incastThreshold << "_IET" << g_incastExitThreshold << "_FN" << g_flowNumber << "_SFN"<< g_specialFlowNumber << "_" << "FG" <<  g_flowgap*1000000 << g_simName << "_" << "B" << g_XmpBeta << "_" << GetQueueMode() << "_" << "K" << g_REDmaxTh << "_" << g_rtt << "_ST" << g_simTime << "_" << "SF" << g_subflows;
+    oss << g_scenario << "_" << "CM" << g_cwndMin << "_" << g_flowType << "_DS" << g_IsAdaptiveSubflow << "_IT" << g_incastThreshold << "_IET" << g_incastExitThreshold << "_FN" << g_flowNumber << "_SFN"<< g_specialFlowNumber << "_" << "FG" <<  g_flowgap*1000000 << g_simName << "_" << "B" << g_XmpBeta << "_" << GetQueueMode() << "_" << "K" << g_REDmaxTh << "_" << g_rtt << "_ST" << g_simTime << "_" << "SF" << g_subflows;
   string tmp = oss.str();
   oss.str("");
   return tmp;
@@ -452,7 +452,7 @@ PrintParams ()
   cout << "Red[" << IsActive (g_enableRED) << "] " << "K[" << g_REDmaxTh << "] QueueSampling[" << g_samplingInterval<< "] SimEnd[" << g_simTime << "]" << endl;
   cout << "SpecialSource[" << IsActive(g_specialSource) << "] SpecialFlowNum[" << g_specialFlowNumber << "] SpecialFlowType[" << g_specialFlowType <<"] SpecialSubflow[" << IsActive(g_specialSubflow) << "]"<< endl;
   cout << "CwndMin[" << g_cwndMin << "] RwndScale[" << g_rwndScale << "] Default_CC[" << g_cc << "]"<< endl;
-  cout << "DynamicSubflow[" << IsActive(g_dynamicSubflow) << "] IncastThresh[" << g_incastThreshold << "] IncastExitThresh[" << g_incastExitThreshold << "]" << endl;
+  cout << "IsAdaptiveSubflow[" << IsActive(g_IsAdaptiveSubflow) << "] IncastThresh[" << g_incastThreshold << "] IncastExitThresh[" << g_incastExitThreshold << "]" << endl;
   cout << "FlowEndTimeGap[" << g_flowEndTimeGap << "]" << endl;
   cout << "IncastInterval[" << g_enabledIncastInterval <<"] Interval[" << g_incastIntervalTime << "]" << endl;
   cout << "-------------------------" << endl;
@@ -834,10 +834,10 @@ SetSpecialSubflow (std::string input)
 }
 
 bool
-SetDynamicSubflow (std::string input)
+SetIsAdaptiveSubflow (std::string input)
 {
-  cout << "DynamicSubflow   : " << g_dynamicSubflow << " -> " << input << endl;
-  g_dynamicSubflow = atoi (input.c_str ());
+  cout << "IsAdaptiveSubflow   : " << g_IsAdaptiveSubflow << " -> " << input << endl;
+  g_IsAdaptiveSubflow = atoi (input.c_str ());
   return true;
 }
 bool
@@ -924,7 +924,7 @@ main (int argc, char *argv[])
   cmd.AddValue ("senders", "No. of senders", MakeCallback (SetSenders));
   cmd.AddValue ("iet", "Incast Threshold ",MakeCallback(SetIncastExitThreshold));
   cmd.AddValue ("it", "Incast Threshold ", MakeCallback(SetIncastThreshold));
-  cmd.AddValue ("ds", "Dynamic Subflow ", MakeCallback(SetDynamicSubflow));
+  cmd.AddValue ("ds", "Dynamic Subflow ", MakeCallback(SetIsAdaptiveSubflow));
   cmd.AddValue ("cwndmin", "Flows", MakeCallback (SetCwndMin));
   cmd.AddValue ("rwndscale", "Flows", MakeCallback (SetRcwndScale));
   cmd.AddValue ("ssf", "Special subflow", MakeCallback (SetSpecialSubflow));
@@ -966,7 +966,7 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
   Config::SetDefault ("ns3::MpTcpSocketBase::IncastExitThresh", UintegerValue(g_incastExitThreshold));
   Config::SetDefault ("ns3::MpTcpSocketBase::IncastThresh", UintegerValue(g_incastThreshold));
-  Config::SetDefault ("ns3::MpTcpSocketBase::DynamicSubflow", BooleanValue(g_dynamicSubflow));
+  Config::SetDefault ("ns3::MpTcpSocketBase::IsAdaptiveSubflow", BooleanValue(g_IsAdaptiveSubflow));
   Config::SetDefault ("ns3::MpTcpSocketBase::CwndMin", UintegerValue (g_cwndMin));
   Config::SetDefault ("ns3::MpTcpSocketBase::RwndScale", UintegerValue (g_rwndScale));
   Config::SetDefault ("ns3::MpTcpSocketBase::DctcpAlphaPerAck", BooleanValue (g_dctcpAlphaPerAck)); //SHOULD BE FALSE!!!

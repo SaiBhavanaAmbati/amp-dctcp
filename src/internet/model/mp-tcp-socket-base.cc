@@ -167,10 +167,10 @@ MpTcpSocketBase::GetTypeId (void)
                     BooleanValue (false),
                     MakeBooleanAccessor (&MpTcpSocketBase::m_disjoinPath),
                     MakeBooleanChecker ())
-    .AddAttribute ("DynamicSubflow",
+    .AddAttribute ("IsAdaptiveSubflow",
                    "Dynamic subflow adjustment, especially in the incast scenarios",
                    BooleanValue (false),
-                   MakeBooleanAccessor (&MpTcpSocketBase::m_dynamicSubflow),
+                   MakeBooleanAccessor (&MpTcpSocketBase::m_isAdaptiveSubflow),
                    MakeBooleanChecker ())
    .AddAttribute ("IncastThresh",
                   "Incast Threshold",
@@ -268,7 +268,7 @@ MpTcpSocketBase::MpTcpSocketBase () :
   m_slowDownEcnLike = false;
   m_dctcpFastAlpha  = false;
   m_initialRand = rand() % 230;
-  m_incastCounter = 0;
+  m_CongestionRound = 0;
   m_incastReDoCounter = 0;
   m_incastEnterHits = 0;
   m_incastExitHits = 0;
@@ -1399,11 +1399,11 @@ MpTcpSocketBase::AddEcmpTag (Ptr<Packet> p, uint8_t sFlowIdx)
 //}
 
 void
-MpTcpSocketBase::CheckIncast (uint8_t sFlowIdx)
+MpTcpSocketBase::ShouldSuppressSubflows (uint8_t sFlowIdx)
 {
   assert(sFlowIdx == 0);
-  uint32_t localCounter = 0;
-  if (m_incastCounter >= m_incastThreshold)
+  uint32_t lowCongestionWindowSubflows = 0;
+  if (m_CongestionRound >= m_incastThreshold)
     { // Fallback mode... but now try to return to normal MPTCP operation
       Ptr<MpTcpSubFlow> sFlow = subflows[0];
       if ((sFlow->cwnd.Get () / sFlow->MSS) > m_cwndMin && sFlow->dctcp_last_fraction == 0 && sFlow->m_inFastRec == false && !(sFlow->maxSeqNb > sFlow->TxSeqNumber - 1))
@@ -1414,7 +1414,7 @@ MpTcpSocketBase::CheckIncast (uint8_t sFlowIdx)
       // Reset incastCounter && incastReDoCounter
       if (m_incastReDoCounter >= m_incastExitThreshold)
         {
-          m_incastCounter = 0;
+          m_CongestionRound = 0;
           m_incastReDoCounter = 0; // prevent carrying value to the next episode
           m_incastExitHits++; // statistic
         }
@@ -1429,17 +1429,21 @@ MpTcpSocketBase::CheckIncast (uint8_t sFlowIdx)
               if (((uint32_t)(sFlow->cwnd.Get () / sFlow->MSS) == m_cwndMin) /*&& sFlow->dctcp_last_fraction == 1*/ && sFlow->m_inFastRec == false
                   && !(sFlow->maxSeqNb > sFlow->TxSeqNumber - 1))
                 {
-                  localCounter++;
+                  lowCongestionWindowSubflows++;
                 }
             }
         }
-      if (localCounter == subflows.size ())
-        m_incastCounter++;
-      else
-        m_incastCounter = 0;
+      if (lowCongestionWindowSubflows >= subflows.size ())  {
+          m_CongestionRound = 0;
+      } else {
+
+        m_CongestionRound++;
+
+      }
+        
 
       // statistic
-      if (m_incastCounter >= m_incastThreshold)
+      if (m_CongestionRound >= m_incastThreshold)
         m_incastEnterHits++;
     }
 }
@@ -1483,8 +1487,8 @@ MpTcpSocketBase::CalculateDCTCPAlpha (uint8_t sFlowIdx, uint32_t ack)
       if (m_dctcpFastAlpha)
         sFlow->dctcp_alpha = sFlow->dctcp_last_fraction;
 
-      if (m_dynamicSubflow && (int)sFlowIdx == 0 && maxSubflows >= 2)
-        CheckIncast(sFlowIdx);
+      if (m_isAdaptiveSubflow && (int)sFlowIdx == 0 && maxSubflows >= 2)
+        ShouldSuppressSubflows(sFlowIdx);
       /*
        cout << Simulator::Now ().GetSeconds () << " [" << m_node->GetId () << "] Subflow(" << (int) sFlow->routeId << ")"
        << " dctcp_marked: " << sFlow->dctcp_marked << " dctcp_total: " << sFlow->dctcp_total << " alpha: "
@@ -2329,7 +2333,7 @@ MpTcpSocketBase::SendPendingData (uint8_t sFlowIdx)
     {
       uint32_t window = 0;
       // Search for a subflow with available windows
-      if (m_dynamicSubflow && m_incastCounter >= m_incastThreshold)
+      if (m_isAdaptiveSubflow && m_CongestionRound >= m_incastThreshold)
         { // When Incast is detected use initial subflow only
           assert (maxSubflows >= 2);
           lastUsedsFlowIdx = 0;
@@ -3319,7 +3323,7 @@ void
 MpTcpSocketBase::calculateTotalCWND ()
 {
   totalCwnd = 0;
-  if (m_dynamicSubflow && m_incastCounter >= m_incastThreshold)
+  if (m_isAdaptiveSubflow && m_CongestionRound >= m_incastThreshold)
     { // Look at subflow zero only as it should only be activated now...
       assert(maxSubflows >= 2);
       if (subflows[0]->m_inFastRec)
@@ -3857,10 +3861,10 @@ MpTcpSocketBase::DoDoGenerateOutPutFile(TypeId tid)
         << "[{"  << GetSocketModel()   << "}]"
         << "[�"  << PrintCC(AlgoCC)    << "�]"
         << "[-"  << SlowDownHits       << "-]"
-        << "[{DS"<< m_dynamicSubflow   << "}]"
+        << "[{DS"<< m_isAdaptiveSubflow   << "}]"
         << "[{IT"<< m_incastThreshold  << "}]"
         << "[{ET"<< m_incastExitThreshold << "}]"
-        << "[{IC"<< m_incastCounter    << "}]"
+        << "[{IC"<< m_CongestionRound    << "}]"
         << "[."  << m_incastEnterHits  << ".]"
         << "[�"  << m_incastExitHits   << "�]"
         << "[{CM"<< m_cwndMin          << "}]"

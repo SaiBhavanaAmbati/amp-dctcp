@@ -77,13 +77,13 @@ public: // public methods
   string   GetSocketModel();
   void CheckIncast(uint8_t);
   void SetCapacity(string);
-  uint32_t m_incastCounter;
+  uint32_t m_CongestionRound;
   uint32_t m_incastReDoCounter;
   uint32_t m_incastThreshold;
   uint32_t m_incastExitThreshold;
   uint64_t m_incastEnterHits;
   uint64_t m_incastExitHits;
-  bool m_dynamicSubflow;
+  bool m_isAdaptiveSubflow;
   uint32_t m_cwndMin;
   string  m_capacity;
   
