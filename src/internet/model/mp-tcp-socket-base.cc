@@ -31,8 +31,8 @@
 #include "ns3/control-tag.h"
 #include "ns3/ecmp-tag.h"
 
-//#define PLOT
-//#define PLOT_DCTCP
+#define PLOT
+#define PLOT_DCTCP
 //#define MANUAL_DROP
 
 #define RAND_GAP
