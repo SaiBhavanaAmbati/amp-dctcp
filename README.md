@@ -23,7 +23,7 @@ CXXFLAGS="-Wall" ./waf --build-profile=optimized configure build
 2. Run a simulation
 
 ``` shell
-./waf --run "incast"
+./waf --run "amp_model"
 ```
 
 License
