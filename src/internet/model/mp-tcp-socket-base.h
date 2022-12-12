@@ -76,13 +76,14 @@ public: // public methods
   uint32_t GetTotalPktSent();
   string   GetSocketModel();
   void ShouldSuppressSubflows(uint8_t);
+  bool IncastDetected();
   void SetCapacity(string);
   uint32_t m_CongestionRound;
-  uint32_t m_incastReDoCounter;
-  uint32_t m_incastThreshold;
-  uint32_t m_incastExitThreshold;
-  uint64_t m_incastEnterHits;
-  uint64_t m_incastExitHits;
+  uint32_t m_CongestionReDoCounter;
+  uint32_t m_CongestionThreshold;
+  uint32_t m_CongestionExitThreshold;
+  uint64_t m_CongestionEnterHits;
+  uint64_t m_CongestionExitHits;
   bool m_isAdaptiveSubflow;
   uint32_t m_cwndMin;
   string  m_capacity;
@@ -294,7 +295,6 @@ protected: // protected methods
   double drand();
   uint32_t GetEstSubflows();
   void SlowDown (uint8_t sFlowIdx); // DCTCP
-  void SlowDownXMPLike (uint8_t sFlowIdx); // DCTCP
   void SlowDownEcnLike (uint8_t sFlowIdx); // DCTCP
   void SlowDownFastReTx (uint8_t sFlowIdx, DSNMapping* ptrDSN, string sockName); // DCTCP
   void CalculateDCTCPAlpha(uint8_t sFlowIdx, uint32_t); // Calculating fraction of Marked pkt and alpha once per rtt
@@ -307,9 +307,6 @@ protected: // protected methods
   void GenerateDctcpAlphaRtt(); //DCTCP Debugging
   void RecordDctcpFastRetx(uint8_t, uint32_t);   //DCTCP Debugging
   bool ManualPacketDrop (uint8_t sFlowIdx, Ptr<Packet> p, uint32_t packetSize);
-  // XMP functions
-  void DoSubflowNewAck(uint8_t sFlowIdx, uint32_t);
-  void DoXMPEnterCWR(uint8_t sFlowIdx);
   string CutFileName(std::string::size_type &position);
   string CutFileNameOnly();
 
@@ -327,10 +324,6 @@ protected: // protected variables
   double m_ADCTg;
   uint32_t m_ADCTthresh;
 
-  // MPTCP connection parameters
-  //Ptr<Node>          m_node;
-  //Ipv4EndPoint*      m_endPoint;
-  //Ptr<TcpL4Protocol> m_mptcp;
   Ipv4Address        m_localAddress;
   Ipv4Address        m_remoteAddress;
   uint16_t           m_localPort;
@@ -338,7 +331,7 @@ protected: // protected variables
   uint8_t            currentSublow;
   uint8_t			m_ceBit;
   uint8_t			m_eceBit;
-  bool              m_DCTCP;      		//< Socket DCTCP capability
+  bool              m_isDCTCPEnabled;      		//< Socket DCTCP capability
   double            m_g;
   bool              m_dctcpAlphaPerAck;
   bool              m_dctcpFastReTxRecord;

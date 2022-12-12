@@ -43,7 +43,6 @@ typedef enum
   COUPLED_EPSILON,        // 6
   COUPLED_INC,            // 7
   COUPLED_FULLY,          // 8
-  XMP,                    // 9
   Fast_Uncoupled,         // 10
   Fast_Increases,         // 11
   XCA                     // 12
